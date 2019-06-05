@@ -36,14 +36,12 @@ public protocol FusumaDelegate: class {
     func fusumaCameraRollUnauthorized()
 
     // optional
-    func fusumaDismissedWithImage(_ image: UIImage, source: FusumaMode)
     func fusumaClosed()
     func fusumaWillClosed()
     func fusumaLimitReached()
 }
 
 public extension FusumaDelegate {
-    func fusumaDismissedWithImage(_ image: UIImage, source: FusumaMode) {}
     func fusumaClosed() {}
     func fusumaWillClosed() {}
     func fusumaLimitReached() {}
@@ -434,18 +432,10 @@ public struct ImageMetadata {
             requestImage(with: self.albumView.phAsset, cropRect: cropRect) { (asset, image) in
                 let metaData = self.getMetaData(asset: asset)
                 self.delegate?.fusumaImageSelected(image, source: self.mode, metaData: metaData)
-
-                self.doDismiss {
-                    self.delegate?.fusumaDismissedWithImage(image, source: self.mode)
-                }
             }
         } else {
             let metaData = getMetaData(asset: albumView.phAsset)
             delegate?.fusumaImageSelected(view.image, source: mode, metaData: metaData)
-
-            doDismiss {
-                self.delegate?.fusumaDismissedWithImage(view.image, source: self.mode)
-            }
         }
     }
 
@@ -535,9 +525,6 @@ extension FusumaViewController: FSAlbumViewDelegate, FSCameraViewDelegate, FSVid
     // MARK: FSCameraViewDelegate
     func cameraShotFinished(_ image: UIImage) {
         delegate?.fusumaImageSelected(image, source: mode, metaData: nil)
-        doDismiss {
-            self.delegate?.fusumaDismissedWithImage(image, source: self.mode)
-        }
     }
 
     public func albumViewCameraRollAuthorized() {
