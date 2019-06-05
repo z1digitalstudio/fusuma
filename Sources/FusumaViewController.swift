@@ -133,6 +133,13 @@ public struct ImageMetadata {
     }
 
     public weak var delegate: FusumaDelegate? = nil
+    override public var title: String? {
+        didSet {
+            if let title = title, let label = titleLabel {
+                label.text = title
+            }
+        }
+    }
 
     override public func loadView() {
         if let view = UINib(nibName: "FusumaViewController", bundle: Bundle(for: self.classForCoder)).instantiate(withOwner: self, options: nil).first as? UIView {
@@ -286,6 +293,7 @@ public struct ImageMetadata {
 
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: false)
         setMode()
     }
 
@@ -376,19 +384,29 @@ public struct ImageMetadata {
 
         switch mode {
         case .library:
-            titleLabel.text = NSLocalizedString(fusumaCameraRollTitle, comment: fusumaCameraRollTitle)
             highlightButton(libraryButton)
             view.bringSubviewToFront(photoLibraryViewerContainer)
         case .camera:
-            titleLabel.text = NSLocalizedString(fusumaCameraTitle, comment: fusumaCameraTitle)
             highlightButton(cameraButton)
             view.bringSubviewToFront(cameraShotContainer)
             cameraView.startCamera()
         case .video:
-            titleLabel.text = NSLocalizedString(fusumaVideoTitle, comment: fusumaVideoTitle)
             highlightButton(videoButton)
             view.bringSubviewToFront(videoShotContainer)
             videoView.startCamera()
+        }
+
+        // Set the screen title. If a view controller title is set, use that.
+        // If not, use the active mode buttons title.
+        switch (title, mode) {
+        case (.some, _):
+            titleLabel.text = title
+        case (_, .library):
+            titleLabel.text = NSLocalizedString(fusumaCameraRollTitle, comment: fusumaCameraRollTitle)
+        case (_, .camera):
+            titleLabel.text = NSLocalizedString(fusumaCameraTitle, comment: fusumaCameraTitle)
+        case (_, .video):
+            titleLabel.text = NSLocalizedString(fusumaVideoTitle, comment: fusumaVideoTitle)
         }
 
         view.bringSubviewToFront(menuView)
