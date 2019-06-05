@@ -75,7 +75,7 @@ public var fusumaCameraTitle     = "Photo"
 public var fusumaVideoTitle      = "Video"
 public var fusumaTitleFont       = UIFont(name: "AvenirNext-DemiBold", size: 15)
 
-public var autoDismiss: Bool = true
+public var fusumaAutoDismiss: Bool = true
 
 @objc public enum FusumaMode: Int {
     case camera
@@ -348,10 +348,8 @@ public struct ImageMetadata {
     }
 
     fileprivate func doDismiss(completion: (() -> Void)?) {
-        if autoDismiss {
-            dismiss(animated: true) {
-                completion?()
-            }
+        if fusumaAutoDismiss {
+            dismiss(animated: true, completion: completion)
         } else {
             completion?()
         }
