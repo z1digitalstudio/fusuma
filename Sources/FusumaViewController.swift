@@ -107,7 +107,7 @@ public struct ImageMetadata {
     public var photoSelectionLimit: Int = 1
     public var autoSelectFirstImage: Bool = false
 
-    private var mode: FusumaMode = .library
+    private lazy var mode: FusumaMode = availableModes[0]
 
     public var availableModes: [FusumaMode] = [.library, .camera]
     public var cameraPosition = AVCaptureDevice.Position.back
@@ -193,7 +193,7 @@ public struct ImageMetadata {
             fatalError("the variable of availableModes should have unique elements.")
         }
 
-        changeMode(availableModes[0], isForced: true)
+        changeMode(mode, isForced: true)
 
         var sortedButtons = [UIButton]()
 
@@ -284,6 +284,11 @@ public struct ImageMetadata {
         doneButton.isEnabled = false
     }
 
+    override public func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setMode()
+    }
+
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
@@ -333,18 +338,60 @@ public struct ImageMetadata {
 
     @IBAction func libraryButtonPressed(_ sender: UIButton) {
         changeMode(FusumaMode.library)
+        setMode()
     }
 
     @IBAction func photoButtonPressed(_ sender: UIButton) {
         changeMode(FusumaMode.camera)
+        setMode()
     }
 
     @IBAction func videoButtonPressed(_ sender: UIButton) {
         changeMode(FusumaMode.video)
+        setMode()
     }
 
     @IBAction func doneButtonPressed(_ sender: UIButton) {
         allowMultipleSelection ? fusumaDidFinishInMultipleMode() : fusumaDidFinishInSingleMode()
+    }
+
+    func changeMode(_ mode: FusumaMode, isForced: Bool = false) {
+        if !isForced && self.mode == mode { return }
+
+        switch self.mode {
+        case .camera:
+            cameraView.stopCamera()
+        case .video:
+            videoView.stopCamera()
+        default:
+            break
+        }
+
+        self.mode = mode
+    }
+
+    private func setMode() {
+        dishighlightButtons()
+        updateDoneButtonVisibility()
+
+        switch mode {
+        case .library:
+            titleLabel.text = NSLocalizedString(fusumaCameraRollTitle, comment: fusumaCameraRollTitle)
+            highlightButton(libraryButton)
+            view.bringSubviewToFront(photoLibraryViewerContainer)
+        case .camera:
+            titleLabel.text = NSLocalizedString(fusumaCameraTitle, comment: fusumaCameraTitle)
+            highlightButton(cameraButton)
+            view.bringSubviewToFront(cameraShotContainer)
+            cameraView.startCamera()
+        case .video:
+            titleLabel.text = NSLocalizedString(fusumaVideoTitle, comment: fusumaVideoTitle)
+            highlightButton(videoButton)
+            view.bringSubviewToFront(videoShotContainer)
+            videoView.startCamera()
+        }
+
+        view.bringSubviewToFront(menuView)
     }
 
     fileprivate func doDismiss(completion: (() -> Void)?) {
@@ -506,44 +553,6 @@ private extension FusumaViewController {
         if availableModes.contains(.camera) {
             cameraView.stopCamera()
         }
-    }
-
-    func changeMode(_ mode: FusumaMode, isForced: Bool = false) {
-
-        if !isForced && self.mode == mode { return }
-
-        switch self.mode {
-        case .camera:
-            cameraView.stopCamera()
-        case .video:
-            videoView.stopCamera()
-        default:
-            break
-        }
-
-        self.mode = mode
-
-        dishighlightButtons()
-        updateDoneButtonVisibility()
-
-        switch mode {
-        case .library:
-            titleLabel.text = NSLocalizedString(fusumaCameraRollTitle, comment: fusumaCameraRollTitle)
-            highlightButton(libraryButton)
-            view.bringSubviewToFront(photoLibraryViewerContainer)
-        case .camera:
-            titleLabel.text = NSLocalizedString(fusumaCameraTitle, comment: fusumaCameraTitle)
-            highlightButton(cameraButton)
-            view.bringSubviewToFront(cameraShotContainer)
-            cameraView.startCamera()
-        case .video:
-            titleLabel.text = NSLocalizedString(fusumaVideoTitle, comment: fusumaVideoTitle)
-            highlightButton(videoButton)
-            view.bringSubviewToFront(videoShotContainer)
-            videoView.startCamera()
-        }
-
-        view.bringSubviewToFront(menuView)
     }
 
     func updateDoneButtonVisibility() {
