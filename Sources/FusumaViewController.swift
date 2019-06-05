@@ -36,14 +36,12 @@ public protocol FusumaDelegate: class {
     func fusumaCameraRollUnauthorized()
 
     // optional
-    func fusumaClosed()
-    func fusumaWillClosed()
+    func fusumaCancel()
     func fusumaLimitReached()
 }
 
 public extension FusumaDelegate {
-    func fusumaClosed() {}
-    func fusumaWillClosed() {}
+    func fusumaCancel() {}
     func fusumaLimitReached() {}
 }
 
@@ -68,8 +66,6 @@ public var fusumaCameraRollTitle = "Library"
 public var fusumaCameraTitle     = "Photo"
 public var fusumaVideoTitle      = "Video"
 public var fusumaTitleFont       = UIFont(name: "AvenirNext-DemiBold", size: 15)
-
-public var fusumaAutoDismiss: Bool = true
 
 @objc public enum FusumaMode: Int {
     case camera
@@ -333,11 +329,7 @@ public struct ImageMetadata {
     }
 
     @IBAction func closeButtonPressed(_ sender: UIButton) {
-        self.delegate?.fusumaWillClosed()
-
-        self.doDismiss {
-            self.delegate?.fusumaClosed()
-        }
+        self.delegate?.fusumaCancel()
     }
 
     @IBAction func libraryButtonPressed(_ sender: UIButton) {
@@ -406,14 +398,6 @@ public struct ImageMetadata {
         }
 
         view.bringSubviewToFront(menuView)
-    }
-
-    fileprivate func doDismiss(completion: (() -> Void)?) {
-        if fusumaAutoDismiss {
-            dismiss(animated: true, completion: completion)
-        } else {
-            completion?()
-        }
     }
 
     private func fusumaDidFinishInSingleMode() {
@@ -486,9 +470,7 @@ public struct ImageMetadata {
                 metaData.append(self.getMetaData(asset: asset))
 
                 if asset == self.albumView.selectedAssets.last {
-                    self.doDismiss {
-                        self.delegate?.fusumaMultipleImageSelected(images, source: self.mode, metaData: metaData)
-                    }
+                    self.delegate?.fusumaMultipleImageSelected(images, source: self.mode, metaData: metaData)
                 }
             }
         }
@@ -541,9 +523,7 @@ extension FusumaViewController: FSAlbumViewDelegate, FSCameraViewDelegate, FSVid
 
     func videoFinished(withFileURL fileURL: URL) {
         delegate?.fusumaVideoCompleted(withFileURL: fileURL)
-        doDismiss(completion: nil)
     }
-
 }
 
 private extension FusumaViewController {
