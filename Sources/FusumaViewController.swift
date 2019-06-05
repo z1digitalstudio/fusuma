@@ -99,8 +99,10 @@ public struct ImageMetadata {
 @objc public class FusumaViewController: UIViewController {
 
     public var cropHeightRatio: CGFloat = 1
-    public var allowMultipleSelection: Bool = false
     public var photoSelectionLimit: Int = 1
+    private var allowMultipleSelection: Bool {
+        return photoSelectionLimit > 1
+    }
     public var autoSelectFirstImage: Bool = false
 
     private lazy var mode: FusumaMode = availableModes[0]
