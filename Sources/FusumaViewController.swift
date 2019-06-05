@@ -30,14 +30,12 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
 }
 
 public protocol FusumaDelegate: class {
-    func fusumaImageSelected(_ image: UIImage, source: FusumaMode)
-    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode)
+    func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata?)
+    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode, metaData: [ImageMetadata])
     func fusumaVideoCompleted(withFileURL fileURL: URL)
     func fusumaCameraRollUnauthorized()
 
     // optional
-    func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata)
-    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode, metaData: [ImageMetadata])
     func fusumaDismissedWithImage(_ image: UIImage, source: FusumaMode)
     func fusumaClosed()
     func fusumaWillClosed()
@@ -45,8 +43,6 @@ public protocol FusumaDelegate: class {
 }
 
 public extension FusumaDelegate {
-    func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata) {}
-    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode, metaData: [ImageMetadata]) {}
     func fusumaDismissedWithImage(_ image: UIImage, source: FusumaMode) {}
     func fusumaClosed() {}
     func fusumaWillClosed() {}
@@ -434,17 +430,16 @@ public struct ImageMetadata {
                                   width: normalizedWidth, height: normalizedHeight)
 
             requestImage(with: self.albumView.phAsset, cropRect: cropRect) { (asset, image) in
-                self.delegate?.fusumaImageSelected(image, source: self.mode)
+                let metaData = self.getMetaData(asset: asset)
+                self.delegate?.fusumaImageSelected(image, source: self.mode, metaData: metaData)
+
                 self.doDismiss {
                     self.delegate?.fusumaDismissedWithImage(image, source: self.mode)
                 }
-
-                let metaData = self.getMetaData(asset: asset)
-
-                self.delegate?.fusumaImageSelected(image, source: self.mode, metaData: metaData)
             }
         } else {
-            delegate?.fusumaImageSelected(view.image, source: mode)
+            let metaData = getMetaData(asset: albumView.phAsset)
+            delegate?.fusumaImageSelected(view.image, source: mode, metaData: metaData)
 
             doDismiss {
                 self.delegate?.fusumaDismissedWithImage(view.image, source: self.mode)
@@ -537,7 +532,7 @@ extension FusumaViewController: FSAlbumViewDelegate, FSCameraViewDelegate, FSVid
 
     // MARK: FSCameraViewDelegate
     func cameraShotFinished(_ image: UIImage) {
-        delegate?.fusumaImageSelected(image, source: mode)
+        delegate?.fusumaImageSelected(image, source: mode, metaData: nil)
         doDismiss {
             self.delegate?.fusumaDismissedWithImage(image, source: self.mode)
         }
