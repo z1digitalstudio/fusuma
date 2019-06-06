@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, FusumaDelegate {
+class ViewController: UIViewController {
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var showButton: UIButton!
     @IBOutlet weak var fileUrlLabel: UILabel!
@@ -25,45 +25,22 @@ class ViewController: UIViewController, FusumaDelegate {
         let fusuma = FusumaViewController()
 
         fusuma.delegate = self
-        fusuma.cropHeightRatio = 1.0
-        fusuma.allowMultipleSelection = false
         fusuma.availableModes = [.library, .video, .camera]
         fusuma.photoSelectionLimit = 4
         fusumaSavesImage = true
 
         present(fusuma, animated: true, completion: nil)
     }
+}
 
-    // MARK: FusumaDelegate Protocol
-    func fusumaImageSelected(_ image: UIImage, source: FusumaMode) {
-        switch source {
-        case .camera:
-            print("Image captured from Camera")
-        case .library:
-            print("Image selected from Camera Roll")
-        default:
-            print("Image selected")
-        }
+extension ViewController: FusumaDelegate {
+    func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata?) {
+        dismiss(animated: true)
+        print("fusumaImageSelected")
 
         imageView.image = image
-    }
 
-    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode) {
-        print("Number of selection images: \(images.count)")
-
-        var count: Double = 0
-
-        for image in images {
-            DispatchQueue.main.asyncAfter(deadline: .now() + (3.0 * count)) {
-                self.imageView.image = image
-                print("w: \(image.size.width) - h: \(image.size.height)")
-            }
-
-            count += 1
-        }
-    }
-
-    func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata) {
+        guard let metaData = metaData else { return }
         print("Image mediatype: \(metaData.mediaType)")
         print("Source image size: \(metaData.pixelWidth)x\(metaData.pixelHeight)")
         print("Creation date: \(String(describing: metaData.creationDate))")
@@ -74,24 +51,31 @@ class ViewController: UIViewController, FusumaDelegate {
         print("Location: \(String(describing: metaData.location))")
     }
 
+    func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode, metaData: [ImageMetadata]) {
+        dismiss(animated: true)
+        print("fusumaMultipleImageSelected")
+
+        print("Number of selection images: \(images.count)")
+        var count: Double = 0
+        for image in images {
+            DispatchQueue.main.asyncAfter(deadline: .now() + (3.0 * count)) {
+                self.imageView.image = image
+                print("w: \(image.size.width) - h: \(image.size.height)")
+            }
+            count += 1
+        }
+    }
+
     func fusumaVideoCompleted(withFileURL fileURL: URL) {
+        dismiss(animated: true)
+        print("fusumaVideoCompleted")
+
         print("video completed and output to file: \(fileURL)")
         self.fileUrlLabel.text = "file output to: \(fileURL.absoluteString)"
     }
 
-    func fusumaDismissedWithImage(_ image: UIImage, source: FusumaMode) {
-        switch source {
-        case .camera:
-            print("Called just after dismissed FusumaViewController using Camera")
-        case .library:
-            print("Called just after dismissed FusumaViewController using Camera Roll")
-        default:
-            print("Called just after dismissed FusumaViewController")
-        }
-    }
-
     func fusumaCameraRollUnauthorized() {
-        print("Camera roll unauthorized")
+        print("fusumaCameraRollUnauthorized")
 
         let alert = UIAlertController(title: "Access Requested",
                                       message: "Saving image needs to access your photo album",
@@ -113,11 +97,8 @@ class ViewController: UIViewController, FusumaDelegate {
         presented.present(alert, animated: true, completion: nil)
     }
 
-    func fusumaClosed() {
-        print("Called when the FusumaViewController disappeared")
-    }
-
-    func fusumaWillClosed() {
-        print("Called when the close button is pressed")
+    func fusumaCancel() {
+        dismiss(animated: true)
+        print("fusumaCancel")
     }
 }
