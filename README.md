@@ -53,47 +53,31 @@ Import Fusuma ```import Fusuma``` then use the following codes in some function 
 ```Swift
 let fusuma = FusumaViewController()
 fusuma.delegate = self
-fusuma.availableModes = [FusumaMode.library, FusumaMode.camera, FusumaMode.video] // Add .video capturing mode to the default .library and .camera modes
-fusuma.cropHeightRatio = 0.6 // Height-to-width ratio. The default value is 1, which means a squared-size photo.
-fusuma.allowMultipleSelection = true // You can select multiple photos from the camera roll. The default value is false.
-self.present(fusuma, animated: true, completion: nil)
+present(fusuma, animated: true, completion: nil)
+// or
+navigationController?.pushViewController(fusuma, animated: true)
 ```
 
 #### Delegate methods
 
 ```Swift
-// Return the image which is selected from camera roll or is taken via the camera.
-func fusumaImageSelected(_ image: UIImage, source: FusumaMode) {
+// The image selected in single mode (from gallery or taken with the camera).
+func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata?)
 
-  print("Image selected")
-}
+// Images selected in multiple selection mode (only from the gallery).
+func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode, metaData: [ImageMetadata])
 
-// Return the image but called after is dismissed.
-func fusumaDismissedWithImage(image: UIImage, source: FusumaMode) {
-        
-  print("Called just after FusumaViewController is dismissed.")
-}
-
-func fusumaVideoCompleted(withFileURL fileURL: URL) {
-
-  print("Called just after a video has been selected.")
-}
+// Called just after a video has been selected.
+func fusumaVideoCompleted(withFileURL fileURL: URL)
 
 // When camera roll is not authorized, this method is called.
-func fusumaCameraRollUnauthorized() {
+func fusumaCameraRollUnauthorized()
 
-  print("Camera roll unauthorized")
-}
+// Optional. Called when the user taps the cancel/close button.
+func fusumaCancel()
 
-// Return selected images when you allow to select multiple photos.
-func fusumaMultipleImageSelected(_ images: [UIImage], source: FusumaMode) {
-
-}
-
-// Return an image and the detailed information.
-func fusumaImageSelected(_ image: UIImage, source: FusumaMode, metaData: ImageMetadata) {
-
-}
+// Optional. In multiple selection mode, called when the user tries to select more photos than allowed.
+func fusumaLimitReached()
 ```
 
 #### How To Customize
@@ -126,16 +110,9 @@ self.present(fusuma, animated: true, completion: nil)
 |**`fusumaVideoTitle `**| String |Text of video title.| `Video` |
 |**`fusumaTitleFont `**| UIFont |Font for title text.| `UIFont(name: "AvenirNext-DemiBold", size: 15)` |
 
-## Fusuma for Xamarin
-Cheesebaron developed Chafu for Xamarin.  
-https://github.com/Cheesebaron/Chafu
-
-## Author
+## Original Author
 ytakzk  
  [https://ytakzk.me](https://ytakzk.me)
- 
-## Donation
-Your support is welcome through Bitcoin 3Ps8tBgz4qn6zVUr5D1wcYrrzYjMgEugqv
  
 ## License
 Fusuma is released under the MIT license.  
