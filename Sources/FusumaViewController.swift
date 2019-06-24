@@ -351,7 +351,7 @@ public struct ImageMetadata {
         allowMultipleSelection ? fusumaDidFinishInMultipleMode() : fusumaDidFinishInSingleMode()
     }
 
-    func changeMode(_ mode: FusumaMode, isForced: Bool = false) {
+    public func changeMode(_ mode: FusumaMode, isForced: Bool = false) {
         if !isForced && self.mode == mode { return }
 
         switch self.mode {
