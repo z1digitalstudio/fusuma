@@ -150,8 +150,11 @@ public struct ImageMetadata {
         videoView.delegate  = self
 
         libraryButton.setTitle(fusumaCameraRollTitle, for: .normal)
+        libraryButton.titleLabel?.font = fusumaTitleFont
         cameraButton.setTitle(fusumaCameraTitle, for: .normal)
+        cameraButton.titleLabel?.font = fusumaTitleFont
         videoButton.setTitle(fusumaVideoTitle, for: .normal)
+        videoButton.titleLabel?.font = fusumaTitleFont
 
         menuView.backgroundColor = fusumaBackgroundColor
         menuView.addBottomBorder(UIColor.black, width: 1.0)
