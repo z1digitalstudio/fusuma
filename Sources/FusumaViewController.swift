@@ -55,6 +55,8 @@ public var fusumaFlashOnImage: UIImage?
 public var fusumaFlashOffImage: UIImage?
 public var fusumaFlipImage: UIImage?
 public var fusumaShotImage: UIImage?
+public var fusumaSelectColor: UIColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.5)
+public var fusumaSelectImage: UIImage?
 
 public var fusumaVideoStartImage: UIImage?
 public var fusumaVideoStopImage: UIImage?
