@@ -381,10 +381,12 @@ public struct ImageMetadata {
             highlightButton(cameraButton)
             view.bringSubviewToFront(cameraShotContainer)
             cameraView.startCamera()
+            albumView.reset()
         case .video:
             highlightButton(videoButton)
             view.bringSubviewToFront(videoShotContainer)
             videoView.startCamera()
+            albumView.reset()
         }
 
         // Set the screen title. If a view controller title is set, use that.

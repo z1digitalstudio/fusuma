@@ -135,6 +135,13 @@ final class FSAlbumView: UIView, UICollectionViewDataSource, UICollectionViewDel
         return true
     }
 
+    public func reset() {
+        images = nil
+        selectedImages.removeAll()
+        selectedAssets.removeAll()
+        initialize()
+    }
+
     @objc func panned(_ sender: UITapGestureRecognizer) {
         if sender.state == UIGestureRecognizer.State.began {
             let view    = sender.view
