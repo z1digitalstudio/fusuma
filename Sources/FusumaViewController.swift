@@ -356,6 +356,10 @@ public struct ImageMetadata {
         allowMultipleSelection ? fusumaDidFinishInMultipleMode() : fusumaDidFinishInSingleMode()
     }
 
+    public func reset() {
+        albumView.reset()
+    }
+
     public func changeMode(_ mode: FusumaMode, isForced: Bool = false) {
         if !isForced && self.mode == mode { return }
 
@@ -371,7 +375,7 @@ public struct ImageMetadata {
         self.mode = mode
     }
 
-    private func setMode() {
+    public func setMode() {
         dishighlightButtons()
         updateDoneButtonVisibility()
 
