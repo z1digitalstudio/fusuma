@@ -475,15 +475,17 @@ public struct ImageMetadata {
         var images = [UIImage]()
         var metaData = [ImageMetadata]()
 
+        let processed = DispatchGroup()
         for asset in albumView.selectedAssets {
+            processed.enter()
             requestImage(with: asset, cropRect: cropRect) { asset, result in
                 images.append(result)
                 metaData.append(self.getMetaData(asset: asset))
-
-                if asset == self.albumView.selectedAssets.last {
-                    self.delegate?.fusumaMultipleImageSelected(images, source: self.mode, metaData: metaData)
-                }
+                processed.leave()
             }
+        }
+        processed.notify(queue: .main) {
+            self.delegate?.fusumaMultipleImageSelected(images, source: self.mode, metaData: metaData)
         }
     }
 
